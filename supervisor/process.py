@@ -352,6 +352,12 @@ class Subprocess:
         """
         now = time.time()
         options = self.config.options
+
+        # Properly stop processes in BACKOFF state.
+        if self.state == ProcessStates.BACKOFF:
+            self.change_state(ProcessStates.STOPPED)
+            return None
+
         if not self.pid:
             msg = ("attempted to kill %s with sig %s but it wasn't running" %
                    (self.config.name, signame(sig)))
